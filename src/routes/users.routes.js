@@ -26,10 +26,19 @@ router.get("/:producttitle", async (req, res) => {
     }
 });
 
+router.post("/", async (req, res) => {
+    const { productthumbnail, producttitle, productdescription, productcost, onoffer } = req.body;
+    try {
+        const result = await pool.query(
+            "INSERT INTO products (productThumbnail, productTitle, productDescription, productCost, onOffer) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            [productthumbnail, producttitle, productdescription, productcost, onoffer]
+        );
+        res.status(201).json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
-router.post ("",(req,res)=>{
-    res.send ("creating a new user")
-})
 router.patch("/:producttitle",(req,res)=>{
     res.send ("updating a user")
 })
