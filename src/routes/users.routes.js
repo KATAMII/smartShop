@@ -39,6 +39,40 @@ router.post("/", async (req, res) => {
     }
 });
 
+router.patch("/:producttitle", async (req, res) => {
+    const { producttitle } = req.params;
+    const { productThumbnail, productTitle, productDescription, productCost, onOffer } = req.body;
+
+    try {
+        let updateOperation;
+
+        if (productThumbnail) {
+            updateOperation = await pool.query("UPDATE products SET productThumbnail = $1 WHERE productTitle = $2 RETURNING *", [productThumbnail, producttitle]);
+        }
+        if (productTitle) {
+            updateOperation = await pool.query("UPDATE products SET productTitle = $1 WHERE productTitle = $2 RETURNING *", [productTitle, producttitle]);
+        }
+        if (productDescription) {
+            updateOperation = await pool.query("UPDATE products SET productDescription = $1 WHERE productTitle = $2 RETURNING *", [productDescription, producttitle]);
+        }
+        if (productCost) {
+            updateOperation = await pool.query("UPDATE products SET productCost = $1 WHERE productTitle = $2 RETURNING *", [productCost, producttitle]);
+        }
+        if (onOffer) {
+            updateOperation = await pool.query("UPDATE products SET onOffer = $1 WHERE productTitle = $2 RETURNING *", [onOffer, producttitle]);
+        }
+
+        if (!updateOperation || updateOperation.rows.length === 0) {
+            return res.status(404).json({ success: false, message: "Product not found or no fields to update" });
+        }
+
+        res.status(200).json({ success: true, data: updateOperation.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
 
 
 router.delete("/:producttitle",async(req,res)=>{
