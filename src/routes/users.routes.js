@@ -39,11 +39,21 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.patch("/:producttitle",(req,res)=>{
-    res.send ("updating a user")
-})
-router.delete("/:producttitle",(req,res)=>{
-    res.send ("deleting a user")
+
+
+router.delete("/:producttitle",async(req,res)=>{
+    const { producttitle } = req.params;
+    try {
+        const deleteoperation = await pool.query("DELETE FROM products WHERE producttitle=$1 ",[producttitle]);
+        if (deleteoperation.rowCount === 1){
+            res.status(200).json({ success: true, message: "Product deleted successfully" });
+        }else{
+            res.status(400).json({ success: false, message: "Product not found" });
+        }
+        res.send(deleteoperation);
+    } catch (err) {
+        res.status(500).json({success:false,message:err.message})
+    }
 })
 
 
